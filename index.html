@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WellGym — Pesquisa de Validação de Persona</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #C8973A;
+    --gold-light: #F0C87A;
+    --gold-pale: #FBF3E3;
+    --dark: #1A1A1A;
+    --dark-2: #2C2C2C;
+    --dark-3: #3E3E3E;
+    --mid: #888;
+    --light: #F5F4F0;
+    --white: #FFFFFF;
+    --green: #3B7A3E;
+    --green-pale: #E8F5E9;
+    --amber: #B97D10;
+    --amber-pale: #FFF8E7;
+    --red: #A32D2D;
+    --red-pale: #FDEEEE;
+    --blue: #185FA5;
+    --blue-pale: #E8F0FB;
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--light);
+    color: var(--dark);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--dark);
+    border-bottom: 1px solid var(--dark-3);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 58px;
+  }
+  .topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .topbar-logo {
+    width: 28px;
+    height: 28px;
+    background: var(--gold);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .topbar-logo svg { width: 16px; height: 16px; fill: var(--dark); }
+  .topbar-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--white);
+    letter-spacing: .06em;
+  }
+  .topbar-name span { color: var(--gold); }
+  .topbar-meta {
+    font-size: 11px;
+    color: var(--mid);
+  }
+  .topbar-nav {
+    display: flex;
+    gap: 4px;
+  }
+  .nav-btn {
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--mid);
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all .15s;
+    font-family: 'Inter', sans-serif;
+  }
+  .nav-btn:hover { color: var(--white); background: var(--dark-3); }
+  .nav-btn.active { color: var(--dark); background: var(--gold); }
+
+  /* HERO */
+  .hero {
+    background: var(--dark);
+    padding: 3.5rem 2rem 3rem;
+    border-bottom: 2px solid var(--gold);
+  }
+  .hero-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+  }
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: .75rem;
+  }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    font-weight: 400;
+    color: var(--white);
+    line-height: 1.05;
+    letter-spacing: .03em;
+    margin-bottom: 1rem;
+  }
+  .hero-title em { color: var(--gold); font-style: normal; }
+  .hero-desc {
+    font-size: 14px;
+    color: #AAA;
+    line-height: 1.7;
+    max-width: 440px;
+  }
+  .hero-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .hero-stat {
+    background: var(--dark-2);
+    border: 1px solid var(--dark-3);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.25rem;
+  }
+  .hero-stat-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 34px;
+    font-weight: 400;
+    letter-spacing: .04em;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .hero-stat-label { font-size: 11px; color: #888; line-height: 1.4; }
+
+  /* MAIN */
+  .main {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem;
+  }
+
+  /* SECTION */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .section-header {
+    margin-bottom: 2rem;
+  }
+  .section-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: .4rem;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    font-weight: 400;
+    letter-spacing: .04em;
+    color: var(--dark);
+    margin-bottom: .5rem;
+  }
+  .section-desc {
+    font-size: 13px;
+    color: var(--mid);
+    max-width: 580px;
+  }
+
+  /* GRID HELPERS */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+
+  /* CARDS */
+  .card {
+    background: var(--white);
+    border: 1px solid #E0DDD5;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+  }
+  .card-sm { padding: 1.1rem 1.25rem; }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 1rem;
+  }
+
+  /* METRIC */
+  .metric-card {
+    background: var(--white);
+    border: 1px solid #E0DDD5;
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+  }
+  .metric-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    font-weight: 400;
+    letter-spacing: .04em;
+    color: var(--dark);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .metric-val.gold { color: var(--gold); }
+  .metric-val.green { color: var(--green); }
+  .metric-label { font-size: 11px; color: var(--mid); }
+  .metric-sub { font-size: 11px; color: #AAA; margin-top: 3px; }
+
+  /* ALERTS */
+  .alert {
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    border-left: 3px solid;
+    margin-bottom: .75rem;
+  }
+  .alert-green { background: var(--green-pale); border-color: var(--green); }
+  .alert-amber { background: var(--amber-pale); border-color: var(--amber); }
+  .alert-red { background: var(--red-pale); border-color: var(--red); }
+  .alert-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+  .alert-green .alert-title { color: var(--green); }
+  .alert-amber .alert-title { color: var(--amber); }
+  .alert-red .alert-title { color: var(--red); }
+  .alert-text { font-size: 12px; color: var(--dark-3); line-height: 1.5; }
+
+  /* BADGES */
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+  .b-confirm { background: var(--green-pale); color: var(--green); }
+  .b-partial { background: var(--amber-pale); color: var(--amber); }
+  .b-alert { background: var(--red-pale); color: var(--red); }
+  .b-new { background: var(--blue-pale); color: var(--blue); }
+
+  /* TABLE */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .data-table th {
+    text-align: left;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--mid);
+    padding: 8px 10px;
+    border-bottom: 1px solid #E8E5DE;
+  }
+  .data-table td {
+    padding: 9px 10px;
+    border-bottom: 1px solid #F0EDE6;
+    color: var(--dark);
+    vertical-align: top;
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: var(--light); }
+
+  /* BAR ROWS */
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .bar-label {
+    font-size: 11px;
+    color: var(--mid);
+    width: 210px;
+    flex-shrink: 0;
+    text-align: right;
+    line-height: 1.3;
+  }
+  .bar-track {
+    flex: 1;
+    background: var(--light);
+    border-radius: 4px;
+    height: 18px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #fff;
+    transition: width .8s cubic-bezier(.4,0,.2,1);
+  }
+  .bar-meta {
+    font-size: 10px;
+    color: var(--mid);
+    width: 55px;
+    text-align: left;
+    flex-shrink: 0;
+  }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 1rem;
+    font-size: 11px;
+    color: var(--mid);
+  }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  /* PERSONA */
+  .persona-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+  .persona-card {
+    background: var(--white);
+    border: 1px solid #E0DDD5;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .persona-header {
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    border-bottom: 1px solid #F0EDE6;
+  }
+  .persona-header.female { background: linear-gradient(135deg, #FBF0F4 0%, #FDF8E1 100%); }
+  .persona-header.male { background: linear-gradient(135deg, #EEF3FB 0%, #F0F7EF 100%); }
+  .avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+    flex-shrink: 0;
+  }
+  .avatar-f { background: #F4C0D1; color: #7A1A3A; }
+  .avatar-m { background: #B5D4F4; color: #0C3A6E; }
+  .persona-name { font-family: 'Bebas Neue', sans-serif; font-size: 22px; font-weight: 400; letter-spacing: .04em; color: var(--dark); margin-bottom: 2px; }
+  .persona-role { font-size: 12px; color: var(--mid); margin-bottom: 4px; }
+  .persona-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+  .ptag {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+    background: rgba(0,0,0,.06);
+    color: var(--dark-3);
+  }
+  .persona-body { padding: 1.25rem 1.5rem; }
+  .p-block { margin-bottom: 1.1rem; }
+  .p-block:last-child { margin-bottom: 0; }
+  .p-block-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--mid);
+    margin-bottom: .4rem;
+  }
+  .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    border: 1px solid;
+    line-height: 1.4;
+  }
+  .tag-pain { background: var(--red-pale); color: #7A1F1F; border-color: #E8B0B0; }
+  .tag-goal { background: var(--green-pale); color: #2A5C2D; border-color: #A8D5AB; }
+  .tag-feat { background: var(--blue-pale); color: #0D3A70; border-color: #96BBEC; }
+  .tag-discard { background: #F5F5F5; color: #777; border-color: #DDD; text-decoration: line-through; }
+  .persona-quote {
+    font-size: 12px;
+    color: var(--mid);
+    font-style: italic;
+    background: var(--light);
+    border-left: 3px solid var(--gold);
+    padding: .7rem 1rem;
+    border-radius: 0 6px 6px 0;
+    margin-top: .75rem;
+    line-height: 1.6;
+  }
+
+  /* GAP TABLE */
+  .gap-highlight { background: var(--amber-pale); }
+
+  /* FOOTER */
+  .footer {
+    background: var(--dark);
+    color: #666;
+    font-size: 11px;
+    text-align: center;
+    padding: 1.5rem 2rem;
+    margin-top: 3rem;
+    border-top: 1px solid var(--dark-3);
+  }
+  .footer strong { color: var(--gold); }
+
+  /* CHART WRAPPER */
+  .chart-wrap { position: relative; }
+
+  /* CHART LEGENDS */
+  .chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: .75rem;
+    font-size: 11px;
+    color: var(--mid);
+  }
+  .chart-legend-item { display: flex; align-items: center; gap: 5px; }
+  .chart-legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .hero-inner { grid-template-columns: 1fr; }
+    .grid-2, .grid-3, .grid-4, .persona-grid { grid-template-columns: 1fr; }
+    .topbar-nav { display: none; }
+    .hero-title { font-size: 26px; }
+    .bar-label { width: 130px; font-size: 10px; }
+  }
+
+  /* SEPARATOR */
+  .sep { height: 1px; background: #E8E5DE; margin: 2rem 0; }
+
+  /* SCROLLTOP */
+  .scroll-nav {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .scroll-nav-btn {
+    padding: 5px 12px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--mid);
+    background: var(--white);
+    border: 1px solid #E0DDD5;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all .15s;
+    font-family: 'Inter', sans-serif;
+  }
+  .scroll-nav-btn:hover { color: var(--dark); border-color: var(--gold); }
+  .scroll-nav-btn.active { background: var(--gold); color: var(--dark); border-color: var(--gold); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">
+      <svg viewBox="0 0 16 16"><path d="M8 2C4.69 2 2 4.69 2 8s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 1.5a4.5 4.5 0 110 9 4.5 4.5 0 010-9zm0 1.5a1 1 0 100 2 1 1 0 000-2zm-3 4a.75.75 0 01.75-.75h4.5a.75.75 0 010 1.5h-4.5A.75.75 0 015 9z"/></svg>
+    </div>
+    <span class="topbar-name">Well<span>Gym</span></span>
+    <span class="topbar-meta" style="margin-left:8px">Pesquisa de Validação · n = 100</span>
+  </div>
+  <nav class="topbar-nav">
+    <button class="nav-btn active" onclick="showSection('visao-geral', this)">Visão Geral</button>
+    <button class="nav-btn" onclick="showSection('validacao', this)">Validação</button>
+    <button class="nav-btn" onclick="showSection('funcionalidades', this)">Funcionalidades</button>
+    <button class="nav-btn" onclick="showSection('personas', this)">Personas Finais</button>
+  </nav>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">WellGym · App de Treino &amp; Dieta · Dados Fictícios Simulados</div>
+      <h1 class="hero-title">Pesquisa de<br><em>Validação de Persona</em></h1>
+      <p class="hero-desc">Quantitativa simulada com 100 respondentes para validar e refinar as hipóteses das protopersonas Marina Castro e Henrique Mendes — usuários de apps de treino e dieta no Brasil.</p>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-val">100</div>
+        <div class="hero-stat-label">respondentes</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val">75%</div>
+        <div class="hero-stat-label">já usam app de treino/dieta hoje</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val">82%</div>
+        <div class="hero-stat-label">pagariam por versão premium</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val">6,2</div>
+        <div class="hero-stat-label">NPS médio de intenção (0–10)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- SCROLL NAV MOBILE -->
+  <div class="scroll-nav" id="mobile-nav">
+    <button class="scroll-nav-btn active" onclick="showSection('visao-geral', this)">Visão Geral</button>
+    <button class="scroll-nav-btn" onclick="showSection('validacao', this)">Validação</button>
+    <button class="scroll-nav-btn" onclick="showSection('funcionalidades', this)">Funcionalidades</button>
+    <button class="scroll-nav-btn" onclick="showSection('personas', this)">Personas Finais</button>
+  </div>
+
+  <!-- ===================== VISÃO GERAL ===================== -->
+  <section class="section active" id="visao-geral">
+
+    <div class="section-header">
+      <div class="section-eyebrow">01 — Visão Geral</div>
+      <h2 class="section-title">Perfil da Amostra</h2>
+      <p class="section-desc">Distribuição dos 100 respondentes por frequência de treino, local, uso de app e disposição a pagar.</p>
+    </div>
+
+    <div class="grid-4" style="margin-bottom:2rem">
+      <div class="metric-card">
+        <div class="metric-val gold">75%</div>
+        <div class="metric-label">Usam app hoje</div>
+        <div class="metric-sub">dos respondentes</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val gold">47%</div>
+        <div class="metric-label">Treinam na academia</div>
+        <div class="metric-sub">local principal</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val gold">41%</div>
+        <div class="metric-label">Treinam 4–5x/sem</div>
+        <div class="metric-sub">frequência mais comum</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val green">6,2</div>
+        <div class="metric-label">NPS de intenção</div>
+        <div class="metric-sub">escala 0–10</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:2rem">
+      <div class="card">
+        <div class="card-title">Frequência de treino semanal</div>
+        <div class="chart-wrap" style="height:220px">
+          <canvas id="c-freq" role="img" aria-label="Frequência de treino: 4-5x 41%, 2-3x 31%, 6+x 16%, 0-1x 12%">4-5x 41%, 2-3x 31%, 6+x 16%, 0-1x 12%</canvas>
+        </div>
+        <div class="chart-legend">
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#3B7A3E"></div>4–5x/sem (41%)</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#C8973A"></div>2–3x/sem (31%)</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#185FA5"></div>6+x/sem (16%)</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#A32D2D"></div>0–1x/sem (12%)</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Onde treinam</div>
+        <div class="chart-wrap" style="height:220px">
+          <canvas id="c-local" role="img" aria-label="Local de treino: Academia 47%, Casa 26%, Ambos 17%, Não treina 10%">Academia 47%, Casa 26%, Ambos 17%, Não treina 10%</canvas>
+        </div>
+        <div class="chart-legend">
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#185FA5"></div>Academia (47%)</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#3B7A3E"></div>Casa (26%)</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#C8973A"></div>Ambos (17%)</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#888"></div>Não treina (10%)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:2rem">
+      <div class="card">
+        <div class="card-title">Disposição a pagar premium</div>
+        <div class="chart-wrap" style="height:220px">
+          <canvas id="c-pagar" role="img" aria-label="Premium: 35% sim, 47% talvez, 18% não">35% sim com certeza, 47% talvez, 18% não</canvas>
+        </div>
+        <div class="chart-legend">
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#3B7A3E"></div>Sim, com certeza (35%)</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#C8973A"></div>Talvez (47%)</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#A32D2D"></div>Não (18%)</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Valor mensal aceito</div>
+        <div class="chart-wrap" style="height:220px">
+          <canvas id="c-valor" role="img" aria-label="Valor: não pagaria 28%, até R$15 25%, R$15-30 25%, R$30-50 14%, mais R$50 8%">Não pagaria 28%, Até R$15 25%, R$15-R$30 25%, R$30-R$50 14%, Mais R$50 8%</canvas>
+        </div>
+        <div class="chart-legend">
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#A32D2D"></div>Não pagaria (28%)</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#C8973A"></div>Até R$15 (25%)</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#3B7A3E"></div>R$15–R$30 (25%)</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#185FA5"></div>R$30+ (22%)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="section-header" style="margin-bottom:1.25rem">
+      <div class="section-eyebrow">Principais alertas</div>
+      <h2 class="section-title" style="font-size:26px">Pontos de atenção</h2>
+    </div>
+
+    <div class="grid-3">
+      <div>
+        <div class="alert alert-green">
+          <div class="alert-title">✓ Alta validação de dores técnicas</div>
+          <div class="alert-text">4 das 12 dores testadas tiveram concordância acima de 65%. Performance e macros escondidos são dores reais e intensas para o usuário.</div>
+        </div>
+        <div class="alert alert-green">
+          <div class="alert-title">✓ Mercado disposto a pagar</div>
+          <div class="alert-text">82% pagaria ou consideraria pagar. Faixa mais sólida: R$15–R$30/mês, com 25% dos respondentes nessa faixa.</div>
+        </div>
+      </div>
+      <div>
+        <div class="alert alert-amber">
+          <div class="alert-title">⚠ Comunicação proativa fraca</div>
+          <div class="alert-text">L11 (comunicação gera confiança) foi a dor com menor validação: média 3,07 e apenas 38% concordam. Hipótese da protopersona feminina exagerou essa dor.</div>
+        </div>
+        <div class="alert alert-amber">
+          <div class="alert-title">⚠ Exercício sem equip. é secundário</div>
+          <div class="alert-text">L08 ficou com média 3,41 e 50% de concordância — relevante, mas não prioridade. A protopersona masculina pode ter superestimado essa necessidade.</div>
+        </div>
+      </div>
+      <div>
+        <div class="alert alert-red">
+          <div class="alert-title">✗ Histórico confiável: dor invisível</div>
+          <div class="alert-text">49% marcaram como funcionalidade mais importante. Nenhuma das protopersonas posicionou isso como dor principal — gap crítico de descoberta.</div>
+        </div>
+        <div class="alert alert-red">
+          <div class="alert-title">✗ Vídeos ignorados pela persona feminina</div>
+          <div class="alert-text">Vídeos e "pular treino" empatados com 36% cada na Q19. A protopersona feminina não priorizou vídeos — ambas as personas precisam de atualização aqui.</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ===================== VALIDAÇÃO ===================== -->
+  <section class="section" id="validacao">
+
+    <div class="section-header">
+      <div class="section-eyebrow">02 — Validação de Hipóteses</div>
+      <h2 class="section-title">Dores testadas vs. dados reais</h2>
+      <p class="section-desc">Escala 1–5 aplicada a 12 hipóteses de dor das protopersonas. Consideramos validadas as dores com concordância (notas 4 ou 5) acima de 65%.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:1.5rem">
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#3B7A3E"></div>Validada — concordância ≥ 65%</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#C8973A"></div>Parcial — concordância 50–64%</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#A32D2D"></div>Fraca — concordância &lt; 50%</div>
+      </div>
+      <div id="dores-bars-full"></div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="section-header" style="margin-bottom:1.25rem">
+      <div class="section-eyebrow">Cruzamento hipótese × dado</div>
+      <h2 class="section-title" style="font-size:26px">Status de cada hipótese</h2>
+    </div>
+
+    <div class="card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Hipótese da protopersona</th>
+            <th>Persona</th>
+            <th>Resultado da pesquisa</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>App lento/trava faz abandonar o registro</td><td>Marina</td><td>66% concordam · média 3,83</td><td><span class="badge b-confirm">Confirmada</span></td></tr>
+          <tr><td>Macros e calorias escondidos em submenus</td><td>Marina</td><td>67% concordam · média 3,82</td><td><span class="badge b-confirm">Confirmada</span></td></tr>
+          <tr><td>Falta edição inline da porção alimentar</td><td>Marina</td><td>53% concordam · média 3,54</td><td><span class="badge b-partial">Parcial</span></td></tr>
+          <tr><td>Liberdade para pular/reordenar exercícios</td><td>Ambas</td><td>68% concordam · média 3,86 — <strong>maior score</strong></td><td><span class="badge b-confirm">Confirmada</span></td></tr>
+          <tr><td>Falta de numeração nos aparelhos</td><td>Marina</td><td>61% concordam · média 3,66</td><td><span class="badge b-confirm">Confirmada</span></td></tr>
+          <tr><td>Quero desfazer exercício marcado por engano</td><td>Marina</td><td>44% concordam · média 3,41</td><td><span class="badge b-partial">Parcial</span></td></tr>
+          <tr><td>Sente falta de vídeos demonstrativos</td><td>Henrique</td><td>54% concordam · média 3,59</td><td><span class="badge b-partial">Parcial</span></td></tr>
+          <tr><td>Pesquisa vídeo fora do app (YouTube)</td><td>Henrique</td><td>58% concordam · média 3,52</td><td><span class="badge b-confirm">Confirmada</span></td></tr>
+          <tr class="gap-highlight"><td>Histórico de treino inconsistente / perda de dados</td><td>Henrique</td><td>51% concordam · 49% priorizaram na Q19 — <strong>funcionalidade #1</strong></td><td><span class="badge b-new">Confirmada + gap</span></td></tr>
+          <tr><td>Comunicação proativa sobre pedidos gera confiança</td><td>Marina</td><td>38% concordam · média 3,07 — <strong>menor score</strong></td><td><span class="badge b-alert">Descartada</span></td></tr>
+          <tr class="gap-highlight"><td>Dashboard com macros visíveis é solução #1</td><td>Marina</td><td>28% na Q19 — 5ª colocação entre 9 opções</td><td><span class="badge b-alert">Rebaixada</span></td></tr>
+          <tr><td>Progressão de cargas como prioridade central</td><td>Henrique</td><td>Histórico confiável confirmado como #1 da Q19 (49%)</td><td><span class="badge b-partial">Reformulada</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </section>
+
+  <!-- ===================== FUNCIONALIDADES ===================== -->
+  <section class="section" id="funcionalidades">
+
+    <div class="section-header">
+      <div class="section-eyebrow">03 — Priorização</div>
+      <h2 class="section-title">Funcionalidades mais pedidas</h2>
+      <p class="section-desc">Na Q19, respondentes escolheram até 3 funcionalidades prioritárias entre 9 opções. O histórico confiável disparou na frente com 49% — ausente no topo de ambas as protopersonas.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:1.5rem">
+      <div class="card-title">Ranking Q19 — escolha até 3 (n = 100)</div>
+      <div class="chart-wrap" style="height:380px">
+        <canvas id="c-funcionalidades" role="img" aria-label="Ranking de funcionalidades: histórico confiável 49%, pular/reordenar e vídeos 36% cada, edição porção e numeração 34% cada, comunicação 33%, modo claro/escuro 30%, dashboard macros 28%, anotações 20%">Histórico confiável lidera com 49%</canvas>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:2rem">
+      <div class="card">
+        <div class="card-title">Apps mais usados atualmente</div>
+        <div class="chart-wrap" style="height:230px">
+          <canvas id="c-apps" role="img" aria-label="Apps usados: Growth Suplementos 27%, Smart Fit 21%, Bluefit 14%, Outro 8%, Max Titanium 5%, não usa 25%">Growth Suplementos 27%, Smart Fit 21%</canvas>
+        </div>
+        <div class="chart-legend">
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#185FA5"></div>Growth Suplementos (27%)</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#3B7A3E"></div>Smart Fit (21%)</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#C8973A"></div>Bluefit (14%)</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#888"></div>Não usa (25%)</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Tempo de uso do app atual</div>
+        <div class="chart-wrap" style="height:230px">
+          <canvas id="c-tempo" role="img" aria-label="Tempo de uso: mais de 1 ano 28%, 6m a 1 ano 24%, 1 a 6 meses 22%, menos de 1 mês 8%, não usa 18%">Mais de 1 ano 28%</canvas>
+        </div>
+        <div class="chart-legend">
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#185FA5"></div>+1 ano (28%)</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#3B7A3E"></div>6m–1 ano (24%)</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#C8973A"></div>1–6 meses (22%)</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#888"></div>&lt;1 mês / N/A (26%)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Análise do gap: o que as personas ignoraram</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>Funcionalidade</th><th>% Q19</th><th>Prioridade protopersona</th><th>Gap</th></tr>
+        </thead>
+        <tbody>
+          <tr class="gap-highlight"><td><strong>Histórico confiável de cargas e dietas</strong></td><td>49%</td><td>Não aparecia como top nas duas personas</td><td><span class="badge b-alert">Gap crítico</span></td></tr>
+          <tr class="gap-highlight"><td><strong>Vídeos demonstrativos de exercícios</strong></td><td>36%</td><td>Só na persona masculina</td><td><span class="badge b-alert">Gap feminino</span></td></tr>
+          <tr><td>Pular/reordenar exercícios</td><td>36%</td><td>Presente nas duas — correto</td><td><span class="badge b-confirm">Alinhado</span></td></tr>
+          <tr><td>Edição rápida de porção de alimento</td><td>34%</td><td>Presente na Marina — correto</td><td><span class="badge b-confirm">Alinhado</span></td></tr>
+          <tr><td>Numeração/identificação de aparelhos</td><td>34%</td><td>Presente na Marina — correto</td><td><span class="badge b-confirm">Alinhado</span></td></tr>
+          <tr><td>Dashboard com macros visíveis</td><td>28%</td><td>Posicionada como top pela Marina</td><td><span class="badge b-partial">Rebaixar para #2</span></td></tr>
+          <tr><td>Comunicação sobre pedidos/pagamentos</td><td>33%</td><td>Hipótese fraca da Marina</td><td><span class="badge b-alert">Descartar</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </section>
+
+  <!-- ===================== PERSONAS ===================== -->
+  <section class="section" id="personas">
+
+    <div class="section-header">
+      <div class="section-eyebrow">04 — Personas Finais</div>
+      <h2 class="section-title">Refinadas pelos dados da pesquisa</h2>
+      <p class="section-desc">Marina e Henrique atualizados com as dores realmente validadas, funcionalidades reordenadas por dado quantitativo e hipóteses descartadas sinalizadas.</p>
+    </div>
+
+    <div class="persona-grid">
+
+      <!-- MARINA -->
+      <div class="persona-card">
+        <div class="persona-header female">
+          <div class="avatar avatar-f">MC</div>
+          <div>
+            <div class="persona-name">Marina Castro</div>
+            <div class="persona-role">Profissional com agenda densa · 28–32 anos · São Paulo</div>
+            <div class="persona-tags">
+              <span class="ptag">Analista / Gestora</span>
+              <span class="ptag">Academia 4–5x/sem</span>
+              <span class="ptag">Massa magra</span>
+            </div>
+          </div>
+        </div>
+        <div class="persona-body">
+          <div class="p-block">
+            <div class="p-block-label">Dores validadas pela pesquisa</div>
+            <div class="tag-list">
+              <span class="tag tag-pain">App lento/trava (66%)</span>
+              <span class="tag tag-pain">Macros em submenus (67%)</span>
+              <span class="tag tag-pain">Reordenar exercícios (68%)</span>
+              <span class="tag tag-pain">Falta numeração (61%)</span>
+              <span class="tag tag-pain">Edição inline parcial (53%)</span>
+              <span class="tag tag-pain">Busca vídeo fora (58%)*</span>
+            </div>
+          </div>
+          <div class="p-block">
+            <div class="p-block-label">Objetivos</div>
+            <div class="tag-list">
+              <span class="tag tag-goal">Ganhar massa magra</span>
+              <span class="tag tag-goal">Registrar dieta rápido</span>
+              <span class="tag tag-goal">Adaptar treino in-loco</span>
+            </div>
+          </div>
+          <div class="p-block">
+            <div class="p-block-label">Funcionalidades prioritárias — ordem validada</div>
+            <div class="tag-list">
+              <span class="tag tag-feat">1. Histórico confiável (#1 geral)</span>
+              <span class="tag tag-feat">2. Pular/reordenar exercícios</span>
+              <span class="tag tag-feat">3. Edição rápida de porção</span>
+              <span class="tag tag-feat">4. Numeração de aparelhos</span>
+              <span class="tag tag-feat">5. Dashboard macros</span>
+              <span class="tag tag-feat">6. Vídeos demonstrativos*</span>
+            </div>
+          </div>
+          <div class="p-block">
+            <div class="p-block-label">Hipótese descartada</div>
+            <div class="tag-list">
+              <span class="tag tag-discard">Comunicação proativa (38% — fraca)</span>
+            </div>
+          </div>
+          <div class="persona-quote">"Eu não tenho tempo pra ficar lutando com o app só pra registrar uma refeição — e preciso saber que meu histórico vai continuar lá quando eu precisar."</div>
+        </div>
+      </div>
+
+      <!-- HENRIQUE -->
+      <div class="persona-card">
+        <div class="persona-header male">
+          <div class="avatar avatar-m">HM</div>
+          <div>
+            <div class="persona-name">Henrique Mendes</div>
+            <div class="persona-role">Executivo orientado a dados · 28–35 anos · Capitais BR</div>
+            <div class="persona-tags">
+              <span class="ptag">Gerente / Head</span>
+              <span class="ptag">Academia 3–5x/sem</span>
+              <span class="ptag">Performance</span>
+            </div>
+          </div>
+        </div>
+        <div class="persona-body">
+          <div class="p-block">
+            <div class="p-block-label">Dores validadas pela pesquisa</div>
+            <div class="tag-list">
+              <span class="tag tag-pain">Histórico inconsistente (51%)</span>
+              <span class="tag tag-pain">Busca vídeo fora do app (58%)</span>
+              <span class="tag tag-pain">Reordenar exercícios (68%)</span>
+              <span class="tag tag-pain">App lento/trava (66%)</span>
+              <span class="tag tag-pain">Macros em submenus (67%)</span>
+              <span class="tag tag-pain">Falta vídeos demonstrativos (54%)</span>
+            </div>
+          </div>
+          <div class="p-block">
+            <div class="p-block-label">Objetivos</div>
+            <div class="tag-list">
+              <span class="tag tag-goal">Progressão de cargas guiada</span>
+              <span class="tag tag-goal">Visualizar evolução em gráficos</span>
+              <span class="tag tag-goal">Otimizar tempo de treino</span>
+            </div>
+          </div>
+          <div class="p-block">
+            <div class="p-block-label">Funcionalidades prioritárias — ordem validada</div>
+            <div class="tag-list">
+              <span class="tag tag-feat">1. Histórico confiável (#1 geral)</span>
+              <span class="tag tag-feat">2. Vídeos demonstrativos</span>
+              <span class="tag tag-feat">3. Pular/reordenar exercícios</span>
+              <span class="tag tag-feat">4. Campo de anotações livres</span>
+              <span class="tag tag-feat">5. Dashboard de progressão</span>
+            </div>
+          </div>
+          <div class="p-block">
+            <div class="p-block-label">Hipótese reformulada</div>
+            <div class="tag-list">
+              <span class="tag tag-discard">Dashboard progressão como #1 → Histórico confiável primeiro</span>
+            </div>
+          </div>
+          <div class="persona-quote">"Preciso de um app que mantenha meu histórico intacto e me mostre a evolução com clareza — não um bando de bugs que apaga meu progresso."</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="section-header" style="margin-bottom:1.25rem">
+      <div class="section-eyebrow">Delta</div>
+      <h2 class="section-title" style="font-size:26px">Protopersona → Persona Validada</h2>
+    </div>
+
+    <div class="card">
+      <table class="data-table">
+        <thead>
+          <tr><th>Dimensão</th><th>Protopersona (antes)</th><th>Persona validada (depois)</th><th>Mudança</th></tr>
+        </thead>
+        <tbody>
+          <tr class="gap-highlight"><td><strong>Dor #1 da Marina</strong></td><td>Dashboard macros visíveis</td><td>Histórico confiável (49% na Q19)</td><td><span class="badge b-alert">Reposicionar</span></td></tr>
+          <tr class="gap-highlight"><td><strong>Dor #1 do Henrique</strong></td><td>Dashboard de progressão</td><td>Histórico confiável de cargas</td><td><span class="badge b-partial">Reformular</span></td></tr>
+          <tr class="gap-highlight"><td><strong>Funcionalidade #1 geral</strong></td><td>Não estava no topo de nenhuma persona</td><td>Histórico confiável (49%)</td><td><span class="badge b-alert">Gap crítico</span></td></tr>
+          <tr><td>Vídeos demonstrativos</td><td>Só na persona masculina</td><td>Relevante para ambas (54% validam)</td><td><span class="badge b-partial">Expandir</span></td></tr>
+          <tr><td>Comunicação proativa</td><td>Hipótese presente na Marina</td><td>Descartada — menor score (3,07)</td><td><span class="badge b-alert">Remover</span></td></tr>
+          <tr><td>Disposição a pagar</td><td>Sem hipótese</td><td>82% pagariam — faixa alvo: R$15–R$30</td><td><span class="badge b-new">Dado novo</span></td></tr>
+          <tr><td>Exercício sem equipamento</td><td>Hipótese secundária</td><td>50% concordam — manter como nice-to-have</td><td><span class="badge b-confirm">Mantido</span></td></tr>
+          <tr><td>NPS de intenção</td><td>Sem hipótese</td><td>6,2 — intenção moderada/positiva</td><td><span class="badge b-new">Dado novo</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </section>
+
+</main>
+
+<footer class="footer">
+  <strong>WellGym</strong> · Pesquisa de Validação de Persona · Dados fictícios simulados (n = 100) ·
+  Protopersonas: Marina Castro &amp; Henrique Mendes · Projeto UX/Product Design
+</footer>
+
+<script>
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn, .scroll-nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) {
+    btn.classList.add('active');
+    const sameText = btn.textContent.trim();
+    document.querySelectorAll('.nav-btn, .scroll-nav-btn').forEach(b => {
+      if (b.textContent.trim() === sameText) b.classList.add('active');
+    });
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+const GOLD = '#C8973A';
+const GREEN = '#3B7A3E';
+const BLUE = '#185FA5';
+const RED = '#A32D2D';
+const MID = '#888888';
+
+const donutOpts = (colors) => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { display: false } },
+  cutout: '62%',
+});
+
+new Chart(document.getElementById('c-freq'), {
+  type: 'doughnut',
+  data: {
+    labels: ['4–5x/sem','2–3x/sem','6+x/sem','0–1x/sem'],
+    datasets: [{ data: [41,31,16,12], backgroundColor: [GREEN,GOLD,BLUE,RED], borderWidth: 3, borderColor: '#fff' }]
+  },
+  options: donutOpts()
+});
+
+new Chart(document.getElementById('c-local'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Academia','Casa','Ambos','Não treina'],
+    datasets: [{ data: [47,26,17,10], backgroundColor: [BLUE,GREEN,GOLD,MID], borderWidth: 3, borderColor: '#fff' }]
+  },
+  options: donutOpts()
+});
+
+new Chart(document.getElementById('c-pagar'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Sim, com certeza','Talvez','Não'],
+    datasets: [{ data: [35,47,18], backgroundColor: [GREEN,GOLD,RED], borderWidth: 3, borderColor: '#fff' }]
+  },
+  options: donutOpts()
+});
+
+new Chart(document.getElementById('c-valor'), {
+  type: 'bar',
+  data: {
+    labels: ['Não pagaria','Até R$15','R$15–R$30','R$30–R$50','Mais de R$50'],
+    datasets: [{
+      data: [28,25,25,14,8],
+      backgroundColor: [RED,GOLD,GREEN,'#185FA5','#0F6E56'],
+      borderRadius: 5,
+      borderWidth: 0
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { display: false },
+      x: { ticks: { font: { size: 10 }, maxRotation: 30, autoSkip: false } }
+    }
+  }
+});
+
+new Chart(document.getElementById('c-funcionalidades'), {
+  type: 'bar',
+  data: {
+    labels: [
+      'Histórico confiável','Pular/reordenar treino','Vídeos demonstrativos',
+      'Edição rápida de porção','Numeração de aparelhos','Comunicação proativa',
+      'Modo claro/escuro','Dashboard macros visíveis','Anotações livres'
+    ],
+    datasets: [{
+      data: [49,36,36,34,34,33,30,28,20],
+      backgroundColor: (ctx) => {
+        const i = ctx.dataIndex;
+        if (i === 0) return GREEN;
+        if (i <= 2) return BLUE;
+        if (i === 7) return GOLD;
+        return MID;
+      },
+      borderRadius: 4,
+      borderWidth: 0
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { max: 58, ticks: { callback: v => v + '%', font: { size: 10 } } },
+      y: { ticks: { font: { size: 11 } } }
+    }
+  }
+});
+
+new Chart(document.getElementById('c-apps'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Growth Suplementos','Smart Fit','Bluefit','Não usa','Outro','Max Titanium'],
+    datasets: [{ data: [27,21,14,25,8,5], backgroundColor: [BLUE,GREEN,GOLD,MID,'#534AB7','#993C1D'], borderWidth: 3, borderColor: '#fff' }]
+  },
+  options: donutOpts()
+});
+
+new Chart(document.getElementById('c-tempo'), {
+  type: 'doughnut',
+  data: {
+    labels: ['+1 ano','6m–1 ano','1–6 meses','<1 mês / N/A'],
+    datasets: [{ data: [28,24,22,26], backgroundColor: [BLUE,GREEN,GOLD,MID], borderWidth: 3, borderColor: '#fff' }]
+  },
+  options: donutOpts()
+});
+
+const dores = [
+  { label: 'L04 — Pular/reordenar exercícios', pct: 68, mean: 3.86 },
+  { label: 'L02 — Macros escondidos em submenus', pct: 67, mean: 3.82 },
+  { label: 'L01 — App lento/trava interrompeu uso', pct: 66, mean: 3.83 },
+  { label: 'L05 — Falta numeração nos aparelhos', pct: 61, mean: 3.66 },
+  { label: 'L12 — Pesquisa vídeo fora do app', pct: 58, mean: 3.52 },
+  { label: 'L07 — Falta de vídeos demonstrativos', pct: 54, mean: 3.59 },
+  { label: 'L03 — Falta edição inline da porção', pct: 53, mean: 3.54 },
+  { label: 'L10 — Já perdeu histórico de dados', pct: 51, mean: 3.51 },
+  { label: 'L09 — Quer campo de anotações livres', pct: 52, mean: 3.50 },
+  { label: 'L08 — Falta de exercício sem equipamento', pct: 50, mean: 3.41 },
+  { label: 'L06 — Desfazer exercício marcado por engano', pct: 44, mean: 3.41 },
+  { label: 'L11 — Comunicação proativa gera confiança', pct: 38, mean: 3.07 },
+];
+
+const barsContainer = document.getElementById('dores-bars-full');
+dores.forEach(d => {
+  const color = d.pct >= 65 ? GREEN : d.pct >= 50 ? GOLD : RED;
+  barsContainer.innerHTML += `
+    <div class="bar-row">
+      <div class="bar-label">${d.label}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${d.pct}%;background:${color}">${d.pct}%</div>
+      </div>
+      <div class="bar-meta">média ${d.mean.toFixed(2)}</div>
+    </div>`;
+});
+
+setTimeout(() => {
+  document.querySelectorAll('.bar-fill').forEach(el => {
+    const w = el.style.width;
+    el.style.width = '0';
+    requestAnimationFrame(() => { el.style.width = w; });
+  });
+}, 100);
+</script>
+</body>
+</html>
